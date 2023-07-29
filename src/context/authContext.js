@@ -12,30 +12,34 @@ export const AuthContextProvider = ({ children }) => {
 
   const login = async (inputs) => {
     try {
-      const res = await axios.post("https://fbapi-668309e6ed75.herokuapp.com/api/auth/login", inputs);
+      const response = await fetch("https://fbapi-668309e6ed75.herokuapp.com/api/auth/login", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify(inputs),
+        credentials: "include", // This enables sending cookies with the request
+      });
   
       // Read the Set-Cookie header from the response
-      const setCookieHeader = res.headers['set-cookie'];
+      const accessTokenHeader = response.headers.get("Set-Cookie");
   
-      // If the Set-Cookie header exists
-      if (setCookieHeader) {
-        // Extract the access_token cookie from the Set-Cookie header
-        const accessTokenCookie = setCookieHeader.find(cookie => cookie.startsWith('access_token='));
+      if (accessTokenHeader) {
+        // Extract the access_token value from the Set-Cookie header
+        const accessToken = accessTokenHeader.split(";")[0].split("=")[1];
   
-        if (accessTokenCookie) {
-          // Extract the access_token value from the cookie
-          const accessToken = accessTokenCookie.split(';')[0].split('=')[1];
+        // Set the JWT token in localStorage
+        localStorage.setItem("access_token", accessToken);
   
-          // Set the JWT token in localStorage
-          localStorage.setItem("access_token", accessToken);
-  
-          // Set the access token in Axios headers for subsequent requests
-          axios.defaults.headers.common['Authorization'] = `Bearer ${accessToken}`;
-        }
+        // Set the access token in Axios headers for subsequent requests
+        axios.defaults.headers.common["Authorization"] = `Bearer ${accessToken}`;
       }
   
+      // Parse the response JSON
+      const data = await response.json();
+  
       // Update the currentUser state with the rest of the user data
-      setCurrentUser(res.data);
+      setCurrentUser(data);
   
     } catch (error) {
       console.log(error);
