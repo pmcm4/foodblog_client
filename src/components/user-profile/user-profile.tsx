@@ -35,7 +35,8 @@ export const UserProfile = ({ className }: UserProfileProps) => {
     bio: '',
     username: ''
   });
-
+  const userId = location.pathname.split("/")[2];
+  const isCurrentUser = currentUser?.id == userId;
   useEffect(() => {
     const fetchData = async () => {
       try {
@@ -58,8 +59,7 @@ export const UserProfile = ({ className }: UserProfileProps) => {
       }
     };
     fetchData();
-  }, [postId]);
-  
+  }, [postId, userId]);
 
   useEffect(() => {
     if (!currentUser) {
@@ -67,8 +67,7 @@ export const UserProfile = ({ className }: UserProfileProps) => {
     }
   }, [currentUser, navigate]);
 
-  const userId = location.pathname.split("/")[2];
-  const isCurrentUser = currentUser?.id == userId;
+
 
   useEffect(() => {
 	const fetchData = async () => {
@@ -86,36 +85,39 @@ export const UserProfile = ({ className }: UserProfileProps) => {
 	fetchData();
   }, [userId]);
 
-  
-  const handleClick = async (e: React.MouseEvent<HTMLButtonElement>) => {
-	e.preventDefault();
-  
-	if (!file) {
-	  console.log('Please select a file.');
-	  return;
-	}
-  
-	// Upload the image and get the URL using the 'upload' function from firebase.tsx
-	const imgUrl = await upload(file);
-  
-	// Prepare the updated user data
-	const updatedUser = {
-	  ...userr,
-	  img: file ? imgUrl : "", // Use the uploaded image URL if a new file was selected
-	  name: userr.name,
-	  uname: userr.username,
-	  bbio: userr.bio,
-	};
-  
-	// Send the updated user data to the server
-	try {
-	  await axios.put(`https://fbapi-668309e6ed75.herokuapp.com/api/users/${userId}`, updatedUser);
-	} catch (err) {
-	  console.log(err);
-	}
-  
-	// Wait for 2 seconds before refreshing the page
 
+  const handleClick = async (e: React.MouseEvent<HTMLButtonElement>) => {
+    e.preventDefault();
+
+    if (!file) {
+      console.log('Please select a file.');
+      return;
+    }
+
+    // Upload the image and get the URL using the 'upload' function from firebase.tsx
+    const imgUrl = await upload(file);
+
+    // Prepare the updated user data
+    const updatedUser = {
+      ...userEdit,
+      img: file ? imgUrl : "", // Use the uploaded image URL if a new file was selected
+      name: userEdit.name,
+      uname: userEdit.username,
+      bbio: userEdit.bio,
+    };
+
+    // Send the updated user data to the server
+    try {
+      await axios.put(`https://fbapi-668309e6ed75.herokuapp.com/api/users/${userId}`, updatedUser);
+    } catch (err) {
+      console.log(err);
+    }
+
+    // Wait for 2 seconds before refreshing the page
+    // ...
+
+    // Update the editMode state to return to non-edit mode
+    setEditMode(false);
   };
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
