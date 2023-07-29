@@ -8,9 +8,7 @@ export const AuthContextProvider = ({ children }) => {
   const [currentUser, setCurrentUser] = useState(JSON.parse(localStorage.getItem("user")) || null);
 
   // Set withCredentials to true for Axios
-  useEffect(() => {
-    axios.defaults.withCredentials = true;
-  }, []);
+  axios.defaults.withCredentials = true;
 
   const login = async (inputs) => {
     try {
