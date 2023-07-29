@@ -80,13 +80,13 @@ export const Home = ({ className }: HomeProps) => {
 		  const updatedPosts = await Promise.all(
 			posts.map(async (post) => ({
 			  ...post,
-			  img: post.img ? await storage.ref(post.img).getDownloadURL() : '',
-			  userImg: post.userImg ? await storage.ref(post.userImg).getDownloadURL() : '',
+			  img: post.img ? await storage.refFromURL(post.img).getDownloadURL() : '',
+			  userImg: post.userImg ? await storage.refFromURL(post.userImg).getDownloadURL() : '',
 			}))
 		  );
 		  setPosts(updatedPosts);
 		};
-	
+	  
 		fetchImageUrls();
 	  }, [posts]);
 
