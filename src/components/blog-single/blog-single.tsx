@@ -17,6 +17,8 @@ import ArrowBackIcon from '@mui/icons-material/ArrowBack';
 import { AuthContext } from '../../context/authContext';
 import FavoriteIcon from '@mui/icons-material/Favorite';
 import SendIcon from '@mui/icons-material/Send';
+import { storage } from '../../firebase'; // Import the 'storage' object from 'firebase.tsx' with correct path
+
 
 export interface BlogSingleProps {
 	className?: string;
@@ -100,6 +102,22 @@ export const BlogSingle = ({ className }: BlogSingleProps) => {
 		userImg: '',
 		uid: '',
 	});
+	useEffect(() => {
+		const fetchData = async () => {
+		  try {
+			const res = await axios.get(`https://fbapi-668309e6ed75.herokuapp.com/api/posts/${postId}`);
+			const postData = res.data;
+			setPost({
+			  ...postData,
+			  img: postData.img ? await storage.ref(postData.img).getDownloadURL() : '',
+			  userImg: postData.userImg ? await storage.ref(postData.userImg).getDownloadURL() : '',
+			});
+		  } catch (err) {
+			console.log(err);
+		  }
+		};
+		fetchData();
+	  }, [postId]);
 
 	const currentUserOwnsPost = currentUser?.id === post?.uid;
 	const userID = currentUser.id;
@@ -231,7 +249,7 @@ export const BlogSingle = ({ className }: BlogSingleProps) => {
 				</div>
 				<img
 					className={styles.blogPic}
-					src={`../upload/${post?.img}`}
+					src={post?.img}
 				/>
 				<div className={styles.blogContent}>
 					<div className={styles.profile}>
@@ -301,7 +319,7 @@ export const BlogSingle = ({ className }: BlogSingleProps) => {
 							<div className={styles.commentBox}>
 								<div>
 									<img
-										src={`../upload/${comment?.userImage}`}
+										src={post?.userImg}
 										className={styles.user}
 									/>
 								</div>

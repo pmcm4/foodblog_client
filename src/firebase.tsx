@@ -17,6 +17,9 @@ const firebaseConfig = {
   firebase.initializeApp(firebaseConfig);
 
   const storage = firebase.storage();
+
+  export { firebase, storage };
+
   
   // Pass 'file' as an argument to the upload function
   export const upload = async (file: any) => {
