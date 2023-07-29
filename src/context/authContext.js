@@ -13,6 +13,7 @@ export const AuthContextProvider = ({ children }) => {
   const login = async (inputs) => {
     try {
       const res = await axios.post("https://fbapi-668309e6ed75.herokuapp.com/api/auth/login", inputs);
+      console.log(res.data); // Check the response data
       setCurrentUser(res.data);
 
       // Set the JWT token in localStorage upon successful login
