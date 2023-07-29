@@ -13,19 +13,23 @@ export const AuthContextProvider = ({ children }) => {
   const login = async (inputs) => {
     try {
       const res = await axios.post("https://fbapi-668309e6ed75.herokuapp.com/api/auth/login", inputs, { withCredentials: true });
-      
-      // Check if the access_token cookie is available in document.cookie
-      const cookies = document.cookie.split('; ');
-      const accessTokenCookie = cookies.find((cookie) => cookie.startsWith('access_token='));
-      console.log(accessTokenCookie); // Check the response data
-      if (accessTokenCookie) {
-        const accessToken = accessTokenCookie.split('=')[1];
   
-        // Set the JWT token in localStorage
-        localStorage.setItem("access_token", accessToken);
+      // Read the cookies from the response headers
+      const cookies = res.headers['set-cookie'];
+      if (cookies) {
+        // Find the access_token cookie
+        const accessTokenCookie = cookies.find(cookie => cookie.startsWith('access_token='));
   
-        // You can also set the access token in Axios headers if needed for subsequent requests
-        axios.defaults.headers.common['Authorization'] = `Bearer ${accessToken}`;
+        if (accessTokenCookie) {
+          // Extract the access_token value from the cookie
+          const accessToken = accessTokenCookie.split(';')[0].split('=')[1];
+  
+          // Set the JWT token in localStorage
+          localStorage.setItem("access_token", accessToken);
+  
+          // You can also set the access token in Axios headers if needed for subsequent requests
+          axios.defaults.headers.common['Authorization'] = `Bearer ${accessToken}`;
+        }
       }
   
       // Update the currentUser state with the rest of the user data
@@ -36,7 +40,6 @@ export const AuthContextProvider = ({ children }) => {
       console.log(error);
     }
   };
-  
 
   const logout = async () => {
     await axios.post("https://fbapi-668309e6ed75.herokuapp.com/api/auth/logout");
