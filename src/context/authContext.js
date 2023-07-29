@@ -12,13 +12,15 @@ export const AuthContextProvider = ({ children }) => {
 
   const login = async (inputs) => {
     try {
-      const res = await axios.post("https://fbapi-668309e6ed75.herokuapp.com/api/auth/login", inputs, { withCredentials: true });
+      const res = await axios.post("https://fbapi-668309e6ed75.herokuapp.com/api/auth/login", inputs);
   
-      // Read the cookies from the response headers
-      const cookies = res.headers['set-cookie'];
-      if (cookies) {
-        // Find the access_token cookie
-        const accessTokenCookie = cookies.find(cookie => cookie.startsWith('access_token='));
+      // Read the Set-Cookie header from the response
+      const setCookieHeader = res.headers['set-cookie'];
+  
+      // If the Set-Cookie header exists
+      if (setCookieHeader) {
+        // Extract the access_token cookie from the Set-Cookie header
+        const accessTokenCookie = setCookieHeader.find(cookie => cookie.startsWith('access_token='));
   
         if (accessTokenCookie) {
           // Extract the access_token value from the cookie
@@ -31,11 +33,9 @@ export const AuthContextProvider = ({ children }) => {
           axios.defaults.headers.common['Authorization'] = `Bearer ${accessToken}`;
         }
       }
-      console.log(cookies)
   
       // Update the currentUser state with the rest of the user data
-      const { password, ...userData } = res.data;
-      setCurrentUser(userData);
+      setCurrentUser(res.data);
   
     } catch (error) {
       console.log(error);
