@@ -253,7 +253,7 @@ export const BlogSingle = ({ className }: BlogSingleProps) => {
 				/>
 				<div className={styles.blogContent}>
 					<div className={styles.profile}>
-						<img className={styles.pic} src={`../upload/${post?.userImg}`} />
+						<img className={styles.pic} src={post?.userImg} />
 						<Link style={{ textDecoration: 'none', color: "black" }} to={`/adminprofile/${post.uid}`} className={styles.name}>
 							<span className={styles.name}>{post.username}</span>
 						</Link>

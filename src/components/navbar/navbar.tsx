@@ -6,6 +6,7 @@ import { ProfileLogout } from '../profile-logout/profile-logout';
 import { AuthContext } from '../../context/authContext';
 import axios from 'axios';
 import moment from 'moment';
+import { storage } from '../../firebase'; 
 
 export interface NavbarProps {
     className?: string;
@@ -17,7 +18,7 @@ export interface NavbarProps {
  */
 export const Navbar = ({ className }: NavbarProps) => {
 
-    const [notifications, setNotif] = useState<
+    const [notifications, setNotifications] = useState<
     {
       username: string;
       passage: string;
@@ -26,7 +27,7 @@ export const Navbar = ({ className }: NavbarProps) => {
       user_image: string;
       postID: string;
     }[]
-    >([]);
+  >([]);
 
     const [modal, setModal] = useState(false);
     const toggleModal = () => {
@@ -41,15 +42,26 @@ export const Navbar = ({ className }: NavbarProps) => {
     const userId = currentUser?.id;
 
     useEffect(() => {
-        const fetchData = async () => {
+        const fetchNotifications = async () => {
           try {
             const res = await axios.get(`https://fbapi-668309e6ed75.herokuapp.com/api/posts/allnotif/${userId}`);
-            setNotif(res.data);
+            const notificationsData = res.data;
+    
+            // Update the image URLs for each notification
+            const notificationsWithImages = await Promise.all(
+              notificationsData.map(async (notif: any) => {
+                const userImgURL = notif.user_image ? await storage.ref(notif.user_image).getDownloadURL() : '';
+                const postImgURL = notif.post_image ? await storage.ref(notif.post_image).getDownloadURL() : '';
+                return { ...notif, user_image: userImgURL, post_image: postImgURL };
+              })
+            );
+    
+            setNotifications(notificationsWithImages);
           } catch (err) {
             console.log(err);
           }
         };
-        fetchData();
+        fetchNotifications();
       }, [userId]);
 
     var Scroll = require('react-scroll');
@@ -66,7 +78,7 @@ export const Navbar = ({ className }: NavbarProps) => {
         element.style.width
             = '0';
     }
-
+    
     return (
         <div className={classNames(styles.root, className)}>
             <span className={styles.openslide}>
@@ -175,12 +187,12 @@ export const Navbar = ({ className }: NavbarProps) => {
                             <Link className={styles.notifBody} to={`/post/${notif.postID}`}>
                             <div className={styles.notifBody}>
                                 <div className={styles.notif}>
-                                    <img className={styles.userPic} src={`../upload/${notif.user_image}`}/>
+                                    <img className={styles.userPic} src={notif.user_image}/>
                                     <div className={styles.notifText}>
                                         <span className={styles.userName}>{notif.username} <span className={styles.passage}> {notif.passage}</span></span>
                                         <span className={styles.time}>{moment(notif.date).fromNow()}</span>
                                     </div>
-                                    <img className={styles.postPic} src={`../upload/${notif.post_image}`}/>
+                                    <img className={styles.postPic} src={notif.post_image}/>
                                 </div>
                             </div>
                             </Link>

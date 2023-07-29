@@ -72,7 +72,9 @@ export const Create = ({ className }: CreateProps) => {
       }
 
       // Wait for 2 seconds before refreshing the page
-  
+      setTimeout(() => {
+        window.location.reload();
+      }, 2000);
   };
 
   console.log('test');

@@ -10,6 +10,7 @@ import axios from 'axios';
 import { AuthContext } from '../../context/authContext';
 import EditIcon from '@mui/icons-material/Edit';
 import CloseIcon from '@mui/icons-material/Close';
+import { storage } from '../../firebase'; 
 
 export interface AdminProfileProps {
 	className?: string;
@@ -36,6 +37,8 @@ export const AdminProfile = ({ className }: AdminProfileProps) => {
 		username: ''
 	});
 	console.log(uname)
+
+
 
 	useEffect(() => {
 		if (!currentUser) {
@@ -66,7 +69,21 @@ export const AdminProfile = ({ className }: AdminProfileProps) => {
 		fetchData();
 	}, [userId]);
 
-
+	useEffect(() => {
+		const fetchData = async () => {
+		  try {
+			const res = await axios.get(`https://fbapi-668309e6ed75.herokuapp.com/api/users/getuser/${userId}`);
+			const userData = res.data;
+			setUserEdit({
+			  ...userData,
+			  img: userData.img ? await storage.ref(userData.img).getDownloadURL() : '',
+			});
+		  } catch (err) {
+			console.log(err);
+		  }
+		};
+		fetchData();
+	  }, [userId]);
 
 	const upload = async () => {
 		try {
@@ -146,7 +163,7 @@ export const AdminProfile = ({ className }: AdminProfileProps) => {
 					<div className={styles.left1}>
 						<img
 							className={styles.profPic}
-							src={`../upload/${userEdit.img}`}
+							src={userEdit.img}
 						/>
 						<h1 className={styles.name}>{userEdit.name}</h1>
 						<span className={styles.userName}>@{userEdit.username}</span>
@@ -180,7 +197,7 @@ export const AdminProfile = ({ className }: AdminProfileProps) => {
 									<Link className="link" to={`/post/${post.id}`}>
 										<img
 											className={styles.image}
-											src={`../upload/${post.img}`}
+											src={post.img}
 										/>
 									</Link>
 								</div>
