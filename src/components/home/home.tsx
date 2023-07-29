@@ -19,6 +19,7 @@ import moment from "moment";
 import FavoriteBorderIcon from '@mui/icons-material/FavoriteBorder';
 import { storage } from '../../firebase'; 
 
+
 export interface HomeProps {
 	className?: string;
 }
@@ -29,62 +30,79 @@ export interface HomeProps {
  */
 export const Home = ({ className }: HomeProps) => {
 	const [posts, setPosts] = useState<
-		{
-			username: string;
-			title: string;
-			desc: string;
-			img: string;
-			id: string;
-			cat: string;
-			liked: boolean;
-			likes: number;
-			date: string;
-			userImg: string;
+    {
+      username: string;
+      title: string;
+      desc: string;
+      img: string;
+      id: string;
+      cat: string;
+      liked: boolean;
+      likes: number;
+      date: string;
+      userImg: string;
+    }[]
+  >([]);
+  const [post, setPost] = useState({});
 
-		}[]
-	>([]);
-	const [post, setPost] = useState({});
+  const cat = useLocation().search;
 
-	const cat = useLocation().search;
-
-	useEffect(() => {
-		const fetchData = async () => {
-		  try {
-			const res = await axios.get(`https://fbapi-668309e6ed75.herokuapp.com/api/posts/${cat}`);
-			const postsData = res.data;
-	
-			// Fetch image URLs for each post using Promise.all
-			const postsWithImageUrls = await Promise.all(
-			  postsData.map(async (post: any) => ({
-				...post,
-				img: post.img ? await storage.ref(post.img).getDownloadURL() : '',
-				userImg: post.userImg ? await storage.ref(post.userImg).getDownloadURL() : '',
-			  }))
-			);
-	
-			setPosts(postsWithImageUrls);
-		  } catch (err) {
-			console.log(err);
-		  }
-		};
-		fetchData();
-	  }, [cat]);
-	
+  useEffect(() => {
+    const fetchData = async () => {
+      try {
+        const res = await axios.get(`https://fbapi-668309e6ed75.herokuapp.com/api/posts/${cat}`);
+        setPosts(res.data);
+      } catch (err) {
+        console.log(err);
+      }
+    };
+    fetchData();
+  }, [cat]);
 
 	const location = useLocation();
 	const postId = location.pathname.split("/")[2];
 
 	useEffect(() => {
 		const fetchData = async () => {
-			try {
-				const res = await axios.get(`https://fbapi-668309e6ed75.herokuapp.com/api/posts/${postId}`);
-				setPost(res.data);
-			} catch (err) {
-				console.log(err);
-			}
+		  try {
+			const res = await axios.get(`https://fbapi-668309e6ed75.herokuapp.com/api/posts/${postId}`);
+			setPost(res.data);
+		  } catch (err) {
+			console.log(err);
+		  }
 		};
 		fetchData();
-	}, [postId]);
+	  }, [postId]);
+
+	  // Fetch image URLs from Firebase Storage for each post
+	  useEffect(() => {
+		const fetchImageUrls = async () => {
+		  const updatedPosts = await Promise.all(
+			posts.map(async (post) => {
+			  let imgUrl = '';
+			  if (post.img) {
+				const imgRef = storage.refFromURL(post.img);
+				imgUrl = await imgRef.getDownloadURL();
+			  }
+	  
+			  let userImgUrl = '';
+			  if (post.userImg) {
+				const userImgRef = storage.refFromURL(post.userImg);
+				userImgUrl = await userImgRef.getDownloadURL();
+			  }
+	  
+			  return {
+				...post,
+				img: imgUrl,
+				userImg: userImgUrl,
+			  };
+			})
+		  );
+		  setPosts(updatedPosts);
+		};
+	  
+		fetchImageUrls();
+	  }, []);
 
 
 	const navigate = useNavigate();
