@@ -147,7 +147,7 @@ export const UserProfile = ({ className }: UserProfileProps) => {
                   <Link className="link" to={`/post/${like.id}`}>
                     <img
                       className={styles.image}
-                      src={`../upload/${like.img}`}
+                      src={like.img}
                     />
                   </Link>
                 </div>
