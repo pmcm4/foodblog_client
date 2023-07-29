@@ -11,7 +11,7 @@ import EditIcon from '@mui/icons-material/Edit';
 import CloseIcon from '@mui/icons-material/Close';
 import { getDownloadURL, ref } from 'firebase/storage';
 import { storage } from '../../firebase';
-
+import { upload } from '../../firebase';
 export interface UserProfileProps {
     className?: string;
 }
@@ -73,41 +73,40 @@ export const UserProfile = ({ className }: UserProfileProps) => {
 
       const userId = location.pathname.split("/")[2];
       const isCurrentUser = currentUser?.id == userId;
-      const upload = async () => {
-        try {
-          const formData = new FormData();
-          if (file) {
-            formData.append("file", file);
-          }
-          const res = await axios.post("https://fbapi-668309e6ed75.herokuapp.com/api/upload", formData);
-          return res.data
-        } catch (err) {
-          console.log(err);
-        }
-      };
-      
-      const handleClick = async (e: { preventDefault: () => void; }) => {
-        e.preventDefault();
-    
-        const imgUrl = await upload();
 
-		setUserEdit(userr)
-		setEditMode(false)
-    
-        try {
-          await axios.put(`https://fbapi-668309e6ed75.herokuapp.com/api/users/${userId}`, {
-            name: userr.name,
-            uname: userr.username,
-            bbio: userr.bio,
-            img: file ? imgUrl : "",
-          });
-        } catch (err) {
-          console.log(err);
-        }
-    
-        // Wait for 2 seconds before refreshing the page
-		window.location.reload()
-      };
+      
+	  const handleClick = async (e: React.MouseEvent<HTMLButtonElement>) => {
+		e.preventDefault();
+	  
+		if (!file) {
+		  console.log('Please select a file.');
+		  return;
+		}
+	  
+		// Upload the image and get the URL using the 'upload' function from firebase.tsx
+		const imgUrl = await upload(file);
+	  
+		// Prepare the updated user data
+		const updatedUser = {
+		  ...userr,
+		  img: file ? imgUrl : "", // Use the uploaded image URL if a new file was selected
+		  name: userr.name,
+		  uname: userr.username,
+		  bbio: userr.bio,
+		};
+	  
+		// Send the updated user data to the server
+		try {
+		  await axios.put(`https://fbapi-668309e6ed75.herokuapp.com/api/users/${userId}`, updatedUser);
+		} catch (err) {
+		  console.log(err);
+		}
+	  
+		// Wait for 2 seconds before refreshing the page
+		setTimeout(() => {
+		  window.location.reload();
+		}, 2000);
+	  };
 
       const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
         const { name, value } = e.target;
