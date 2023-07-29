@@ -41,18 +41,29 @@ export const UserProfile = ({ className }: UserProfileProps) => {
 		username: ''
 	});
     
-    useEffect(() => {
-        const fetchData = async () => {
-          try {
-            const res = await axios.get(`https://fbapi-668309e6ed75.herokuapp.com/api/posts/user/${postId}`);
-            setLikes(res.data);
-			
-          } catch (err) {
-            console.log(err);
-          }
-        };
-        fetchData();
-      }, [postId]);
+  useEffect(() => {
+    const fetchData = async () => {
+      try {
+        const res = await axios.get(`https://fbapi-668309e6ed75.herokuapp.com/api/posts/user/${postId}`);
+        setLikes(res.data);
+
+        // Fetch user data including the profile image from Firebase Storage
+        const userRes = await axios.get(`https://fbapi-668309e6ed75.herokuapp.com/api/users/getuser/${userId}`);
+        const userData = userRes.data;
+        if (userData.img) {
+          // Get the image URL from Firebase Storage
+          const imgUrl = await storage.ref(userData.img).getDownloadURL();
+          // Update the userEdit state with the image URL
+          setUserEdit({ ...userData, img: imgUrl });
+        } else {
+          setUserEdit(userData);
+        }
+      } catch (err) {
+        console.log(err);
+      }
+    };
+    fetchData();
+  }, [postId]);
 
       useEffect(() => {
         if (!currentUser) {
