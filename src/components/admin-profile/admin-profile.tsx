@@ -21,6 +21,7 @@ export const AdminProfile = ({ className }: AdminProfileProps) => {
 	const navigate = useNavigate();
 	const state = useLocation().state;
 	const [file, setFile] = useState<File | null>(null);
+
 	const [name, setName] = useState(state?.name || "");
 	const [uname, setUsername] = useState(state?.uname || "");
 	const [bbio, setBio] = useState(state?.bio || "");
@@ -85,41 +86,42 @@ export const AdminProfile = ({ className }: AdminProfileProps) => {
 		fetchData();
 	  }, [userId]);
 
-	const upload = async () => {
+	  const upload = async () => {
 		try {
-			const formData = new FormData();
-			if (file) {
-				formData.append("file", file);
-			}
-			const res = await axios.post("https://fbapi-668309e6ed75.herokuapp.com/api/upload", formData);
-			return res.data
+		  const formData = new FormData();
+		  if (file) {
+			formData.append("file", file);
+		  }
+		  const res = await axios.post("https://fbapi-668309e6ed75.herokuapp.com/api/upload", formData);
+		  return res.data;
 		} catch (err) {
-			console.log(err);
+		  console.log(err);
 		}
-	};
-	const handleClick = async (e: { preventDefault: () => void; }) => {
+	  };
+	const handleClick = async (e: React.MouseEvent<HTMLButtonElement>) => {
 		e.preventDefault();
-
+	
+		// Upload the image and get the URL
 		const imgUrl = await upload();
-
-		setUserEdit(userr)
-		setEditMode(false)
-
+	
+		// Prepare the updated user data
+		const updatedUser = {
+		  ...userr,
+		  img: file ? imgUrl : "", // Use the uploaded image URL if a new file was selected
+		};
+	
+		// Send the updated user data to the server
 		try {
-			console.log(userr)
-			await axios.put(`https://fbapi-668309e6ed75.herokuapp.com/api/users/${userId}`, {
-				name: userr.name,
-				uname: userr.username,
-				bbio: userr.bio,
-				img: file ? imgUrl : "",
-			});
+		  await axios.put(`https://fbapi-668309e6ed75.herokuapp.com/api/users/${userId}`, updatedUser);
 		} catch (err) {
-			console.log(err);
+		  console.log(err);
 		}
-
+	
 		// Wait for 2 seconds before refreshing the page
-		window.location.reload()
-	};
+		setTimeout(() => {
+		  window.location.reload();
+		}, 2000);
+	  };
 
 	useEffect(() => {
 		const fetchData = async () => {
