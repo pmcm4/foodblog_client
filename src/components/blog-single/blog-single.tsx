@@ -319,7 +319,7 @@ export const BlogSingle = ({ className }: BlogSingleProps) => {
 							<div className={styles.commentBox}>
 								<div>
 									<img
-										src={post?.userImg}
+										src={comment?.userImage}
 										className={styles.user}
 									/>
 								</div>
