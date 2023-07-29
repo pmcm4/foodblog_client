@@ -1,20 +1,24 @@
-import React, { useState, useEffect } from 'react';
-import { Link } from 'react-router-dom';
 import styles from './search.module.scss';
 import classNames from 'classnames';
 import { Navbar } from '../navbar/navbar';
 import { Footer } from '../footer/footer';
 import SearchOutlinedIcon from '@mui/icons-material/SearchOutlined';
-import { LoadingAnimation } from '../loading-animation/loading-animation';
-import { storage } from '../../firebase'; // Import the Firebase storage object
+import { useState, useEffect } from 'react';
+import axios from 'axios';
+import { Link } from 'react-router-dom';
 import DOMPurify from 'dompurify';
 import moment from 'moment';
-import axios from 'axios';
+import { LoadingAnimation } from '../loading-animation/loading-animation';
+import { storage } from '../../firebase'; 
 
 export interface SearchProps {
-  className?: string;
+    className?: string;
 }
 
+/**
+ * This component was created using Codux's Default new component template.
+ * To create custom component templates, see https://help.codux.com/kb/en/article/configuration-for-searchs-and-templates
+ */
 export const Search = ({ className }: SearchProps) => {
   const [posts, setPosts] = useState<
     {
@@ -32,6 +36,7 @@ export const Search = ({ className }: SearchProps) => {
   >([]);
 
   const [searchQuery, setSearchQuery] = useState('');
+
   const [isSearching, setIsSearching] = useState(false);
 
   const fetchPosts = async (query: string) => {
@@ -39,8 +44,19 @@ export const Search = ({ className }: SearchProps) => {
       setPosts([]);
       setIsSearching(true);
       const res = await axios.get(`https://fbapi-668309e6ed75.herokuapp.com/api/posts/search/searchmoto?sc=${query}`);
+      const postsData = res.data;
+
+      // Fetch image URLs for each post and user
+      const postsWithImages = await Promise.all(
+        postsData.map(async (post: any) => ({
+          ...post,
+          img: post.img ? await storage.ref(post.img).getDownloadURL() : '',
+          userImg: post.userImg ? await storage.ref(post.userImg).getDownloadURL() : '',
+        }))
+      );
+
       setIsSearching(false);
-      setPosts(res.data);
+      setPosts(postsWithImages);
     } catch (err) {
       console.log(err);
     }
@@ -61,15 +77,14 @@ export const Search = ({ className }: SearchProps) => {
   };
 
   const getText = (html: string, maxLength: number) => {
-    const doc = new DOMParser().parseFromString(html, 'text/html');
-    const textContent = doc.body.textContent || '';
+    const doc = new DOMParser().parseFromString(html, "text/html");
+    const textContent = doc.body.textContent || "";
     if (textContent.length <= maxLength) {
       return textContent;
     } else {
-      return textContent.substring(0, maxLength) + '...';
+      return textContent.substring(0, maxLength) + "...";
     }
   };
-
   const formatCategoryName = (category: any) => {
     if (category === 'healthyfood') {
       return 'Healthy Food';
@@ -77,39 +92,20 @@ export const Search = ({ className }: SearchProps) => {
       return 'International Food';
     } else if (category.match(/[A-Z]/)) {
       const words = category.split(/(?=[A-Z])/);
-      const formattedName = words.map((word: any) => word.charAt(0).toUpperCase() + word.slice(1)).join(' ');
+      const formattedName = words.map((word:any) => word.charAt(0).toUpperCase() + word.slice(1)).join(' ');
       return formattedName;
     } else {
       return category.charAt(0).toUpperCase() + category.slice(1);
     }
+
   };
 
-  useEffect(() => {
-    const fetchPostsData = async () => {
-      try {
-        setIsSearching(true);
-        const res = await axios.get('https://fbapi-668309e6ed75.herokuapp.com/api/posts/allposts');
-        const postsData = res.data;
+  
 
-        // Update the image URLs for each post
-        const postsWithImages = await Promise.all(
-          postsData.map(async (post: any) => {
-            const imgURL = post.img ? await storage.ref(post.img).getDownloadURL() : '';
-            const userImgURL = post.userImg ? await storage.ref(post.userImg).getDownloadURL() : '';
-            return { ...post, img: imgURL, userImg: userImgURL };
-          })
-        );
+ 
 
-        setIsSearching(false);
-        setPosts(postsWithImages);
-      } catch (err) {
-        setIsSearching(false);
-        console.log(err);
-      }
-    };
+  
 
-    fetchPostsData();
-  }, []);
 
   return (
     <div className={classNames(styles.root, className)}>
@@ -125,23 +121,24 @@ export const Search = ({ className }: SearchProps) => {
           {isSearching ? <LoadingAnimation /> : `There are ${Object.keys(posts).length} results found`}
         </div>
         <div className={styles.searchRes}>
-          {Object.keys(posts).length == 0 && !isSearching ? (
-            <img className={styles.searchResNotFound} src="not-found.png" />
-          ) : (
+            {Object.keys(posts).length == 0 && !isSearching ?
+              <img className={styles.searchResNotFound} src="not-found.png" /> :
             posts.map((post) => (
               <div className={classNames(styles.cardpost, className)} key={post.id}>
                 <Link to={`/post/${post.id}`} style={{ textDecoration: 'none', color: 'black' }}>
                   <div className={styles.container}>
-                    <img className={styles.imgclass} src={`../upload/${post.img}`} />
+                    <img className={styles.imgclass} src={post.img} />
                     <div className={styles.contents}>
                       <div className={styles.catContainer}>
                         <span className={styles.cat}>{formatCategoryName(post.cat)}</span>
                       </div>
                       <span className={styles.title}>{post.title}</span>
-                      <p className={styles.content11}>{getText(DOMPurify.sanitize(post.desc), 100)}</p>
+                      <p className={styles.content11}>
+                        {getText(DOMPurify.sanitize(post.desc), 100)}
+                      </p>
                     </div>
                     <div className={styles.user}>
-                      <img src={`../upload/${post.userImg}`} className={styles.profPic} />
+                      <img src={post.userImg} className={styles.profPic} />
                       <div className={styles.profInfo}>
                         <span className={styles.username}>{post.username}</span>
                         <span className={styles.time}>{moment(post.date).fromNow()}</span>
@@ -150,11 +147,11 @@ export const Search = ({ className }: SearchProps) => {
                   </div>
                 </Link>
               </div>
-            ))
-          )}
+            ))}
         </div>
       </div>
       <Footer />
     </div>
   );
+  
 };
