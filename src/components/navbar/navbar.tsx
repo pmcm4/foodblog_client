@@ -178,23 +178,23 @@ export const Navbar = ({ className }: NavbarProps) => {
 
                     </div>
                     {notifModal && (
-                            <div className='modal'>
-                            <div className={styles.overlay} onClick={toggleLikeModal}></div>
-                            <div className={classNames(styles.root1)}>
-                            <div className={styles.notifBadoy}>
+                    <div className='modal'>
+                        <div className={styles.overlay} onClick={toggleLikeModal}></div>
+                        <div className={classNames(styles.root1)}>
+                        <div className={styles.notifBadoy}>
                             <h1 className={styles.NOTIFHEADER}>Notifications</h1>
                             {notifications.map((notif) => (
-                            <Link className={styles.notifBody} to={`/post/${notif.postID}`}>
-                            <div className={styles.notifBody}>
+                            <Link key={notif.postID} className={styles.notifBody} to={`/post/${notif.postID}`}>
+                                <div className={styles.notifBody}>
                                 <div className={styles.notif}>
-                                    <img className={styles.userPic} src={notif.user_image}/>
+                                    <img className={styles.userPic} src={notif.user_image} />
                                     <div className={styles.notifText}>
-                                        <span className={styles.userName}>{notif.username} <span className={styles.passage}> {notif.passage}</span></span>
-                                        <span className={styles.time}>{moment(notif.date).fromNow()}</span>
+                                    <span className={styles.userName}>{notif.username} <span className={styles.passage}> {notif.passage}</span></span>
+                                    <span className={styles.time}>{moment(notif.date).fromNow()}</span>
                                     </div>
-                                    <img className={styles.postPic} src={notif.post_image}/>
+                                    <img className={styles.postPic} src={notif.post_image} />
                                 </div>
-                            </div>
+                                </div>
                             </Link>
                             ))}
                         </div>
