@@ -101,11 +101,11 @@ export const UserProfile = ({ className }: UserProfileProps) => {
   };
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
-    const { name, value } = e.target;
-    setUser((prevState) => ({
-      ...prevState,
-      [name]: value,
-    }));
+	const { name, value } = e.target;
+	setUser((prevState) => ({
+	  ...prevState,
+	  [name]: value,
+	}));
   };
 
   return (
@@ -154,54 +154,61 @@ export const UserProfile = ({ className }: UserProfileProps) => {
         <Footer />
       </div>
       {editMode ? (
-        // Edit mode UI
-        <>
-          <div className={styles.editProfileOverlay}></div>
-          <div className={styles.editProfile}>
-            <div className={styles.editProfileHeader}>
-              <p className={styles.editProfileHeaderText}>Edit Profile</p>
-              <div className={styles.editProfileHeaderCloseBtn} onClick={() => { setEditMode(false) }}>
-                <CloseIcon sx={{ fontSize: "30px" }} />
-              </div>
-            </div>
-            <div className={styles.editProfileDividerThick}></div>
-            <div className={styles.editProfileForm}>
-              <div className={styles.editProfileFormPhotoContainer}>
-                <p className={styles.editProfileFormPhotoLabel}>Profile Photo</p>
-                <input type='file' id='file' onChange={e => {
-                  const selectedFile = e.target.files?.[0];
-                  if (selectedFile) {
-                    setFile(selectedFile);
-                  }
-                }} />
-              </div>
-              <div className={styles.editProfileDividerThin}></div>
-              <div className={styles.editProfileFormUserName}>
-                <p className={styles.editProfileFormUserNameLabel}>User Name</p>
-                <div className={styles.editProfileFormUserNameRight}>
-                  <input className={styles.editProfileFormUserNameInput} type="text" name="name" value={userr.name} onChange={handleChange} />
-                  <p className={styles.editProfileFormUserNameText}>Usernames can only contain letters, numbers, underscores, and periods</p>
-                </div>
-              </div>
-              <div className={styles.editProfileDividerThin}></div>
-              <div className={styles.editProfileFormName}>
-                <p className={styles.editProfileFormNameLabel}>Name</p>
-                <input className={styles.editProfileFormNameInput} type="text" name="username" value={userr.username} onChange={handleChange} />
-              </div>
-              <div className={styles.editProfileDividerThin}></div>
-              <div className={styles.editProfileFormBio}>
-                <p className={styles.editProfileFormBioLabel}>User Name</p>
-                <div className={styles.editProfileFormBioRight}>
-                  <textarea className={styles.editProfileBioTextArea} name="bio" value={userr.bio} onChange={handleChange} />
-                  <p className={styles.editProfileFormBioText}>{userr.bio.length}/60</p>
-                </div>
-              </div>
-            </div>
-            <div className={styles.editProfileDividerThick}></div>
-            <button className={styles.editProfileSaveBtn} onClick={handleClick}>Save</button>
-          </div>
-        </>
-      ) : <></>}
+				// Edit mode UI
+				<>
+					<div className={styles.editProfileOverlay}></div>
+					<div className={styles.editProfile}>
+						<div className={styles.editProfileHeader}>
+							<p className={styles.editProfileHeaderText}>Edit Profile</p>
+							<div className={styles.editProfileHeaderCloseBtn} onClick={() => {setEditMode(false)} }>
+								<CloseIcon sx={{fontSize: "30px"}} />
+							</div>
+						</div>
+						<div className={styles.editProfileDividerThick}></div>
+						<div className={styles.editProfileForm}>
+							<div className={styles.editProfileFormPhotoContainer}>
+								<p className={styles.editProfileFormPhotoLabel}>Profile Photo</p>
+								<input type='file' id='file' onChange={e => {
+									const selectedFile = e.target.files?.[0];
+									if (selectedFile) {
+										setFile(selectedFile);
+									}
+								}} />
+							</div>
+							<div className={styles.editProfileDividerThin}></div>
+							<div className={styles.editProfileFormUserName}>
+								<p className={styles.editProfileFormUserNameLabel}>User Name</p>
+								<div className={styles.editProfileFormUserNameRight}>
+									<input className={styles.editProfileFormUserNameInput} type="text" name="name" value={userr.name} onChange={handleChange} />
+									<p className={styles.editProfileFormUserNameText}>Usernames can only contain letters, numbers, underscores, and periods</p>
+								</div>
+							</div>
+							<div className={styles.editProfileDividerThin}></div>
+							<div className={styles.editProfileFormName}>
+								<p className={styles.editProfileFormNameLabel}>Name</p>
+								<input className={styles.editProfileFormNameInput} type="text" name="username" value={userr.username} onChange={handleChange} />
+							</div>
+							<div className={styles.editProfileDividerThin}></div>
+							<div className={styles.editProfileFormBio}>
+								<p className={styles.editProfileFormBioLabel}>Bio</p>
+								<div className={styles.editProfileFormBioRight}>
+								<textarea
+								className={styles.editProfileBioTextArea}
+								name="bio"
+								value={userr.bio || ""} // Add a conditional check to handle the case when userr.bio is null or undefined
+								onChange={handleChange}
+								/>
+								<p className={styles.editProfileFormBioText}>
+								{(userr.bio ? userr.bio.length : 0)}/60
+								</p>
+								</div>
+							</div>
+						</div>
+						<div className={styles.editProfileDividerThick}></div>
+						<button className={styles.editProfileSaveBtn} onClick={handleClick}>Save</button>
+					</div>
+				</>
+			) : <></>}
     </>
   );
 };
