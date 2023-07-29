@@ -17,7 +17,6 @@ import DOMPurify from 'dompurify';
 import { AuthContext } from '../../context/authContext';
 import moment from "moment";
 import FavoriteBorderIcon from '@mui/icons-material/FavoriteBorder';
-import { storage } from '../../firebase'; 
 
 
 export interface HomeProps {
@@ -75,21 +74,6 @@ export const Home = ({ className }: HomeProps) => {
 		fetchData();
 	}, [postId]);
 
-	useEffect(() => {
-		const fetchImageUrls = async () => {
-		  const updatedPosts = await Promise.all(
-			posts.map(async (post) => ({
-			  ...post,
-			  img: post.img ? await storage.ref(post.img).getDownloadURL() : '',
-			  userImg: post.userImg ? await storage.ref(post.userImg).getDownloadURL() : '',
-			}))
-		  );
-		  setPosts(updatedPosts);
-		};
-	
-		fetchImageUrls();
-	  }, [posts]);
-
 
 	const navigate = useNavigate();
 
@@ -120,7 +104,6 @@ export const Home = ({ className }: HomeProps) => {
 	};
 
 	const currentCat = cat.split("=")[1]
-	
 
 	return (
 		<div className={classNames(styles.root, className)}>
@@ -205,7 +188,7 @@ export const Home = ({ className }: HomeProps) => {
 									<span className={styles.imgOverlayText}>{post.likes}</span>
 								</div>
 								<img className={styles.imgclass}
-									src={post.img}
+									src={`../upload/${post.img}`}
 								/>
 								<div className={styles.contents}>
 									<div className={styles.catContainer}>
@@ -220,7 +203,7 @@ export const Home = ({ className }: HomeProps) => {
 								</div>
 								<div className={styles.user}>
 									<img
-										src= {post.userImg}
+										src={`../upload/${post.userImg}`}
 										className={styles.profPic}
 									/>
 									<div className={styles.profInfo}>
