@@ -13,10 +13,11 @@ export const AuthContextProvider = ({ children }) => {
   const login = async (inputs) => {
     try {
       const res = await axios.post("https://fbapi-668309e6ed75.herokuapp.com/api/auth/login", inputs, { withCredentials: true });
-      console.log(res.data); // Check the response data
+      
       // Check if the access_token cookie is available in document.cookie
       const cookies = document.cookie.split('; ');
       const accessTokenCookie = cookies.find((cookie) => cookie.startsWith('access_token='));
+      console.log(accessTokenCookie); // Check the response data
       if (accessTokenCookie) {
         const accessToken = accessTokenCookie.split('=')[1];
   
