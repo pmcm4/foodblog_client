@@ -9,7 +9,8 @@ import { Link } from 'react-router-dom';
 import DOMPurify from 'dompurify';
 import moment from 'moment';
 import { LoadingAnimation } from '../loading-animation/loading-animation';
-import { storage } from '../../firebase'; 
+import { storage } from '../../firebase';
+
 
 export interface SearchProps {
     className?: string;
@@ -21,42 +22,32 @@ export interface SearchProps {
  */
 export const Search = ({ className }: SearchProps) => {
   const [posts, setPosts] = useState<
-    {
-      username: string;
-      title: string;
-      desc: string;
-      img: string;
-      id: string;
-      cat: string;
-      liked: boolean;
-      likeCount: number;
-      date: string;
-      userImg: string;
-    }[]
-  >([]);
+  {
+    username: string;
+    title: string;
+    desc: string;
+    img: string;
+    id: string;
+    cat: string;
+    liked: boolean;
+    likeCount: number;
+    date: string;
+    userImg: string;
 
-  const [searchQuery, setSearchQuery] = useState('');
+  }[]
+>([]);
 
-  const [isSearching, setIsSearching] = useState(false);
+  const [searchQeury, setSearchQuery] = useState('')
+
+  const [isSearching, setIsSearching] = useState(false)
 
   const fetchPosts = async (query: string) => {
     try {
-      setPosts([]);
-      setIsSearching(true);
+      setPosts([])
+      setIsSearching(true)
       const res = await axios.get(`https://fbapi-668309e6ed75.herokuapp.com/api/posts/search/searchmoto?sc=${query}`);
-      const postsData = res.data;
-
-      // Fetch image URLs for each post and user
-      const postsWithImages = await Promise.all(
-        postsData.map(async (post: any) => ({
-          ...post,
-          img: post.img ? await storage.ref(post.img).getDownloadURL() : '',
-          userImg: post.userImg ? await storage.ref(post.userImg).getDownloadURL() : '',
-        }))
-      );
-
-      setIsSearching(false);
-      setPosts(postsWithImages);
+      setIsSearching(false)
+      setPosts(res.data);
     } catch (err) {
       console.log(err);
     }
@@ -69,11 +60,11 @@ export const Search = ({ className }: SearchProps) => {
   };
 
   const handleSearchChange = (e: any) => {
-    setSearchQuery(e.target.value);
+    setSearchQuery(e.target.value)
   };
 
   const handleSearchBtn = () => {
-    fetchPosts(searchQuery);
+      fetchPosts(searchQeury);
   };
 
   const getText = (html: string, maxLength: number) => {
@@ -100,11 +91,35 @@ export const Search = ({ className }: SearchProps) => {
 
   };
 
-  
+  useEffect(() => {
+		const fetchImageUrls = async () => {
+		  const updatedPosts = await Promise.all(
+			posts.map(async (post) => {
+			  let imgUrl = '';
+			  if (post.img) {
+				const imgRef = storage.refFromURL(post.img);
+				imgUrl = await imgRef.getDownloadURL();
+			  }
+	  
+			  let userImgUrl = '';
+			  if (post.userImg) {
+				const userImgRef = storage.refFromURL(post.userImg);
+				userImgUrl = await userImgRef.getDownloadURL();
+			  }
+	  
+			  return {
+				...post,
+				img: imgUrl,
+				userImg: userImgUrl,
+			  };
+			})
+		  );
+		  setPosts(updatedPosts);
+		};
+	  
+		fetchImageUrls();
+	  }, []);
 
- 
-
-  
 
 
   return (
