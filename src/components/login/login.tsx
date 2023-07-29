@@ -7,6 +7,7 @@ import { AuthContext } from '../../context/authContext';
 import { useEffect } from 'react';
 import firebase from '../../firebase';
 import { ModalErrors } from '../modal-errors/modal-errors';
+axios.defaults.withCredentials = true;
 
 export interface LoginProps {
     className?: string;
