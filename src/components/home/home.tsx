@@ -238,7 +238,7 @@ export const Home = ({ className }: HomeProps) => {
 									/>
 									<div className={styles.profInfo}>
 										<span className={styles.username}>{post.username}</span>
-										<span className={styles.time}>{moment(post.date).fromNow()}</span>
+										<span className={styles.time}>{moment(post.date).fromNow(true)}</span>
 									</div>
 								</div>
 							</div>

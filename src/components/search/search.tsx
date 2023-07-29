@@ -156,7 +156,7 @@ export const Search = ({ className }: SearchProps) => {
                       <img src={post.userImg} className={styles.profPic} />
                       <div className={styles.profInfo}>
                         <span className={styles.username}>{post.username}</span>
-                        <span className={styles.time}>{moment(post.date).fromNow()}</span>
+                        <span className={styles.time}>{moment(post.date).fromNow(true)}</span>
                       </div>
                     </div>
                   </div>

@@ -328,7 +328,7 @@ export const BlogSingle = ({ className }: BlogSingleProps) => {
 									<span className={styles.username}>{comment.username}</span>
 
 									<span className={styles.commentcontent}>{comment.commentData}</span>
-									<span className={styles.date}>{moment(comment.date).fromNow()}</span>
+									<span className={styles.date}>{moment(comment.date).fromNow(true)}</span>
 								</div>
 								{comment.uid === currentUser?.id && (
 									<DeleteOutlineOutlinedIcon
