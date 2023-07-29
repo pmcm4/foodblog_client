@@ -27,10 +27,11 @@ export const AuthContextProvider = ({ children }) => {
           // Set the JWT token in localStorage
           localStorage.setItem("access_token", accessToken);
   
-          // You can also set the access token in Axios headers if needed for subsequent requests
+          // Set the access token in Axios headers for subsequent requests
           axios.defaults.headers.common['Authorization'] = `Bearer ${accessToken}`;
         }
       }
+      console.log(cookies)
   
       // Update the currentUser state with the rest of the user data
       const { password, ...userData } = res.data;
