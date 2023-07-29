@@ -59,6 +59,7 @@ export const UserProfile = ({ className }: UserProfileProps) => {
     };
     fetchData();
   }, [postId]);
+  
 
   useEffect(() => {
     if (!currentUser) {
@@ -69,6 +70,23 @@ export const UserProfile = ({ className }: UserProfileProps) => {
   const userId = location.pathname.split("/")[2];
   const isCurrentUser = currentUser?.id == userId;
 
+  useEffect(() => {
+	const fetchData = async () => {
+	  try {
+		const res = await axios.get(`https://fbapi-668309e6ed75.herokuapp.com/api/users/getuser/${userId}`);
+		const userData = res.data;
+		setUserEdit({
+		  ...userData,
+		  img: userData.img ? await storage.ref(userData.img).getDownloadURL() : '',
+		});
+	  } catch (err) {
+		console.log(err);
+	  }
+	};
+	fetchData();
+  }, [userId]);
+
+  
   const handleClick = async (e: React.MouseEvent<HTMLButtonElement>) => {
 	e.preventDefault();
   
