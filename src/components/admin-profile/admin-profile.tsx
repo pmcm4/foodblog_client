@@ -118,9 +118,7 @@ export const AdminProfile = ({ className }: AdminProfileProps) => {
 		}
 	
 		// Wait for 2 seconds before refreshing the page
-		setTimeout(() => {
-		  window.location.reload();
-		}, 2000);
+		
 	  };
 	
 
