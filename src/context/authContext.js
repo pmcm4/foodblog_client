@@ -5,23 +5,27 @@ import { createContext } from "react";
 export const AuthContext = createContext();
 
 export const AuthContextProvider = ({ children }) => {
-  const [currentUser, setCurrentUser] = useState(JSON.parse(localStorage.getItem("user")) || null); // Get the user data from localStorage
+  const [currentUser, setCurrentUser] = useState(JSON.parse(localStorage.getItem("user")) || null);
+
+  // Set withCredentials to true for Axios
+  useEffect(() => {
+    axios.defaults.withCredentials = true;
+  }, []);
 
   const login = async (inputs) => {
     try {
       const res = await axios.post("https://fbapi-668309e6ed75.herokuapp.com/api/auth/login", inputs);
       setCurrentUser(res.data);
-  
+
       // Set the JWT token in localStorage upon successful login
       localStorage.setItem("access_token", res.data.access_token);
-  
+
       // Set the JWT token in Axios headers for subsequent requests
       axios.defaults.headers.common['Authorization'] = `Bearer ${res.data.access_token}`;
     } catch (error) {
       console.log(error);
     }
   };
-  
 
   const logout = async () => {
     await axios.post("https://fbapi-668309e6ed75.herokuapp.com/api/auth/logout");
