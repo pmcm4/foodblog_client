@@ -11,6 +11,7 @@ import { AuthContext } from '../../context/authContext';
 import EditIcon from '@mui/icons-material/Edit';
 import CloseIcon from '@mui/icons-material/Close';
 import { storage } from '../../firebase'; 
+import { upload } from '../../firebase';
 
 export interface AdminProfileProps {
 	className?: string;
@@ -86,39 +87,35 @@ export const AdminProfile = ({ className }: AdminProfileProps) => {
 		fetchData();
 	  }, [userId]);
 
-	  const upload = async () => {
-		try {
-		  const formData = new FormData();
-		  if (file) {
-			formData.append("file", file);
-		  }
-		  const res = await axios.post("https://fbapi-668309e6ed75.herokuapp.com/api/upload", formData);
-		  return res.data;
-		} catch (err) {
-		  console.log(err);
-		}
-	  };
+
 	  const handleClick = async (e: React.MouseEvent<HTMLButtonElement>) => {
 		e.preventDefault();
-	
-		// Upload the image and get the URL
-		const imgUrl = await upload();
-	
+	  
+		if (!file) {
+		  console.log('Please select a file.');
+		  return;
+		}
+	  
+		// Upload the image and get the URL using the 'upload' function from firebase.tsx
+		const imgUrl = await upload(file);
+	  
 		// Prepare the updated user data
 		const updatedUser = {
 		  ...userr,
 		  img: file ? imgUrl : "", // Use the uploaded image URL if a new file was selected
 		};
-	
+	  
 		// Send the updated user data to the server
 		try {
 		  await axios.put(`https://fbapi-668309e6ed75.herokuapp.com/api/users/${userId}`, updatedUser);
 		} catch (err) {
 		  console.log(err);
 		}
-	
+	  
 		// Wait for 2 seconds before refreshing the page
-		
+		setTimeout(() => {
+		  window.location.reload();
+		}, 2000);
 	  };
 	
 
