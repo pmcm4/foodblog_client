@@ -29,19 +29,20 @@ export interface HomeProps {
  */
 export const Home = ({ className }: HomeProps) => {
 	const [posts, setPosts] = useState<
-    {
-      username: string;
-      title: string;
-      desc: string;
-      img: string;
-      id: string;
-      cat: string;
-      liked: boolean;
-      likes: number;
-      date: string;
-      userImg: string;
-    }[]
-  >([]);
+		{
+			username: string;
+			title: string;
+			desc: string;
+			img: string;
+			id: string;
+			cat: string;
+			liked: boolean;
+			likes: number;
+			date: string;
+			userImg: string;
+
+		}[]
+	>([]);
 	const [post, setPost] = useState({});
 
 	const cat = useLocation().search;
@@ -51,6 +52,8 @@ export const Home = ({ className }: HomeProps) => {
 		  try {
 			const res = await axios.get(`https://fbapi-668309e6ed75.herokuapp.com/api/posts/${cat}`);
 			const postsData = res.data;
+	
+			// Fetch image URLs for each post using Promise.all
 			const postsWithImageUrls = await Promise.all(
 			  postsData.map(async (post: any) => ({
 				...post,
@@ -58,6 +61,7 @@ export const Home = ({ className }: HomeProps) => {
 				userImg: post.userImg ? await storage.ref(post.userImg).getDownloadURL() : '',
 			  }))
 			);
+	
 			setPosts(postsWithImageUrls);
 		  } catch (err) {
 			console.log(err);
@@ -65,6 +69,7 @@ export const Home = ({ className }: HomeProps) => {
 		};
 		fetchData();
 	  }, [cat]);
+	
 
 	const location = useLocation();
 	const postId = location.pathname.split("/")[2];
