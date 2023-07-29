@@ -17,7 +17,7 @@ import DOMPurify from 'dompurify';
 import { AuthContext } from '../../context/authContext';
 import moment from "moment";
 import FavoriteBorderIcon from '@mui/icons-material/FavoriteBorder';
-
+import { storage } from '../../firebase'; 
 
 export interface HomeProps {
 	className?: string;
@@ -29,35 +29,42 @@ export interface HomeProps {
  */
 export const Home = ({ className }: HomeProps) => {
 	const [posts, setPosts] = useState<
-		{
-			username: string;
-			title: string;
-			desc: string;
-			img: string;
-			id: string;
-			cat: string;
-			liked: boolean;
-			likes: number;
-			date: string;
-			userImg: string;
-
-		}[]
-	>([]);
+    {
+      username: string;
+      title: string;
+      desc: string;
+      img: string;
+      id: string;
+      cat: string;
+      liked: boolean;
+      likes: number;
+      date: string;
+      userImg: string;
+    }[]
+  >([]);
 	const [post, setPost] = useState({});
 
 	const cat = useLocation().search;
 
 	useEffect(() => {
 		const fetchData = async () => {
-			try {
-				const res = await axios.get(`https://fbapi-668309e6ed75.herokuapp.com/api/posts/${cat}`);
-				setPosts(res.data);
-			} catch (err) {
-				console.log(err);
-			}
+		  try {
+			const res = await axios.get(`https://fbapi-668309e6ed75.herokuapp.com/api/posts/${cat}`);
+			const postsData = res.data;
+			const postsWithImageUrls = await Promise.all(
+			  postsData.map(async (post: any) => ({
+				...post,
+				img: post.img ? await storage.ref(post.img).getDownloadURL() : '',
+				userImg: post.userImg ? await storage.ref(post.userImg).getDownloadURL() : '',
+			  }))
+			);
+			setPosts(postsWithImageUrls);
+		  } catch (err) {
+			console.log(err);
+		  }
 		};
 		fetchData();
-	}, [cat]);
+	  }, [cat]);
 
 	const location = useLocation();
 	const postId = location.pathname.split("/")[2];
@@ -188,7 +195,7 @@ export const Home = ({ className }: HomeProps) => {
 									<span className={styles.imgOverlayText}>{post.likes}</span>
 								</div>
 								<img className={styles.imgclass}
-									src={`../upload/${post.img}`}
+									src={post.img}
 								/>
 								<div className={styles.contents}>
 									<div className={styles.catContainer}>
@@ -203,7 +210,7 @@ export const Home = ({ className }: HomeProps) => {
 								</div>
 								<div className={styles.user}>
 									<img
-										src={`../upload/${post.userImg}`}
+										src={post.userImg}
 										className={styles.profPic}
 									/>
 									<div className={styles.profInfo}>
