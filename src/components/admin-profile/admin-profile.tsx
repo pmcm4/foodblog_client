@@ -98,7 +98,7 @@ export const AdminProfile = ({ className }: AdminProfileProps) => {
 		  console.log(err);
 		}
 	  };
-	const handleClick = async (e: React.MouseEvent<HTMLButtonElement>) => {
+	  const handleClick = async (e: React.MouseEvent<HTMLButtonElement>) => {
 		e.preventDefault();
 	
 		// Upload the image and get the URL
@@ -122,6 +122,7 @@ export const AdminProfile = ({ className }: AdminProfileProps) => {
 		  window.location.reload();
 		}, 2000);
 	  };
+	
 
 	useEffect(() => {
 		const fetchData = async () => {
@@ -149,10 +150,10 @@ export const AdminProfile = ({ className }: AdminProfileProps) => {
 	const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
 		const { name, value } = e.target;
 		setUser((prevState) => ({
-			...prevState,
-			[name]: value,
+		  ...prevState,
+		  [name]: value,
 		}));
-	};
+	  };
 	const isCurrentUser = currentUser?.id == userId;
 
 	console.log(isCurrentUser)
@@ -258,8 +259,15 @@ export const AdminProfile = ({ className }: AdminProfileProps) => {
 							<div className={styles.editProfileFormBio}>
 								<p className={styles.editProfileFormBioLabel}>User Name</p>
 								<div className={styles.editProfileFormBioRight}>
-									<textarea className={styles.editProfileBioTextArea} name="bio" value={userr.bio} onChange={handleChange} />
-									<p className={styles.editProfileFormBioText}>{userr.bio.length}/60</p>
+								<textarea
+								className={styles.editProfileBioTextArea}
+								name="bio"
+								value={userr.bio || ""} // Add a conditional check to handle the case when userr.bio is null or undefined
+								onChange={handleChange}
+								/>
+								<p className={styles.editProfileFormBioText}>
+								{(userr.bio ? userr.bio.length : 0)}/60
+								</p>
 								</div>
 							</div>
 						</div>
