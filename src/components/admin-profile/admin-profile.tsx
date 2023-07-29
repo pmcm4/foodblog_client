@@ -103,6 +103,9 @@ export const AdminProfile = ({ className }: AdminProfileProps) => {
 		const updatedUser = {
 		  ...userr,
 		  img: file ? imgUrl : "", // Use the uploaded image URL if a new file was selected
+		  name: userr.name,
+		  uname: userr.username,
+		  bbio: userr.bio,
 		};
 	  
 		// Send the updated user data to the server
@@ -252,7 +255,7 @@ export const AdminProfile = ({ className }: AdminProfileProps) => {
 							</div>
 							<div className={styles.editProfileDividerThin}></div>
 							<div className={styles.editProfileFormBio}>
-								<p className={styles.editProfileFormBioLabel}>User Name</p>
+								<p className={styles.editProfileFormBioLabel}>Bio</p>
 								<div className={styles.editProfileFormBioRight}>
 								<textarea
 								className={styles.editProfileBioTextArea}
