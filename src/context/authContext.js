@@ -13,14 +13,20 @@ export const AuthContextProvider = ({ children }) => {
   const login = async (inputs) => {
     try {
       const res = await axios.post("https://fbapi-668309e6ed75.herokuapp.com/api/auth/login", inputs);
-      console.log(res.data); // Check the response data
-      setCurrentUser(res.data);
-
-      // Set the JWT token in localStorage upon successful login
-      localStorage.setItem("access_token", res.data.access_token);
-
-      // Set the JWT token in Axios headers for subsequent requests
-      axios.defaults.headers.common['Authorization'] = `Bearer ${res.data.access_token}`;
+  
+      // Get the access_token from the response cookies
+      const accessToken = res.headers["set-cookie"][0].split(";")[0].split("=")[1];
+  
+      // Set the JWT token in localStorage
+      localStorage.setItem("access_token", accessToken);
+  
+      // You can also set the access token in Axios headers if needed for subsequent requests
+      axios.defaults.headers.common['Authorization'] = `Bearer ${accessToken}`;
+  
+      // Update the currentUser state with the rest of the user data
+      const { password, ...userData } = res.data;
+      setCurrentUser(userData);
+  
     } catch (error) {
       console.log(error);
     }
